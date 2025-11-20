@@ -16,6 +16,12 @@ import {ZamaEthereumConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 import {ERC7984} from "openzeppelin-confidential-contracts/contracts/token/ERC7984/ERC7984.sol";
 
 contract CERC20 is ZamaEthereumConfig, ERC7984, Ownable2Step {
+    error UnauthorizedMinter();
+
+    address public minter;
+
+    event MinterUpdated(address indexed newMinter);
+
     constructor(
         address owner,
         uint64 amount,
@@ -25,5 +31,20 @@ contract CERC20 is ZamaEthereumConfig, ERC7984, Ownable2Step {
     ) ERC7984(name_, symbol_, tokenURI_) Ownable(owner) {
         euint64 encryptedAmount = FHE.asEuint64(amount);
         _mint(owner, encryptedAmount);
+    }
+
+    function setMinter(address _minter) external onlyOwner {
+        minter = _minter;
+        emit MinterUpdated(_minter);
+    }
+
+    function mint(address _to, euint64 _amount) external {
+        // if (msg.sender != minter) revert UnauthorizedMinter();
+        _mint(_to, _amount);
+    }
+
+    function burn(address _from, euint64 _amount) external {
+        if (msg.sender != minter) revert UnauthorizedMinter();
+        _burn(_from, _amount);
     }
 }

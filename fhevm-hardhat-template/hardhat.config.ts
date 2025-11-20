@@ -1,4 +1,10 @@
-import "@fhevm/hardhat-plugin";
+// Only load FHEVM plugin for specific networks to avoid conflicts with standard EVM chains
+const network = process.env.HARDHAT_NETWORK || "hardhat";
+const fhevmNetworks = ["hardhat", "anvil", "localhost"];
+if (fhevmNetworks.includes(network)) {
+  require("@fhevm/hardhat-plugin");
+}
+
 import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-ethers";
 import "@nomicfoundation/hardhat-verify";
@@ -10,7 +16,7 @@ import { vars } from "hardhat/config";
 import "solidity-coverage";
 
 import "./tasks/accounts";
-import "./tasks/FHECounter";
+// import "./tasks/FHECounter"; // Commented out to avoid conflicts with standard networks
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 
@@ -56,6 +62,24 @@ const config: HardhatUserConfig = {
       },
       chainId: 11155111,
       url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+    },
+    scrollSepolia: {
+      accounts: {
+        mnemonic: MNEMONIC,
+        path: "m/44'/60'/0'/0/",
+        count: 10,
+      },
+      chainId: 534351,
+      url: "https://sepolia-rpc.scroll.io",
+    },
+    baseSepolia: {
+      accounts: {
+        mnemonic: MNEMONIC,
+        path: "m/44'/60'/0'/0/",
+        count: 10,
+      },
+      chainId: 84532,
+      url: "https://sepolia.base.org",
     },
   },
   paths: {
