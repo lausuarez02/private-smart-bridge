@@ -39,8 +39,10 @@ export function DepositDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="w-full">
-          <ArrowDownLeft className="mr-2 h-4 w-4" />
+        <Button
+          size="lg"
+          className="bg-cyan-400 hover:bg-cyan-500 text-black font-bold rounded-full px-8"
+        >
           Deposit
         </Button>
       </DialogTrigger>

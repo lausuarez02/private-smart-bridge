@@ -52,6 +52,13 @@ export function useDeposit() {
         }
       }
 
+      // Verify we're on the right chain
+      const network = await provider.getNetwork();
+      console.log('Connected to chain ID:', network.chainId.toString());
+      if (network.chainId !== 84532n) {
+        throw new Error('Please switch to Base Sepolia network');
+      }
+
       // 3. Get contract instances
       const depositor = new Contract(
         BASE_SEPOLIA_CONTRACTS.AaveDepositorBase,
@@ -69,9 +76,19 @@ export function useDeposit() {
       const amountWei = parseUnits(amount, 6);
 
       // 5. Check USDC balance
-      const balance = await usdc.balanceOf(userAddress);
-      if (balance < amountWei) {
-        throw new Error('Insufficient USDC balance');
+      try {
+        const balance = await usdc.balanceOf(userAddress);
+        console.log('USDC Balance:', formatUnits(balance, 6), 'USDC');
+        console.log('Requested amount:', formatUnits(amountWei, 6), 'USDC');
+
+        if (balance < amountWei) {
+          throw new Error(`Insufficient USDC balance. You have ${formatUnits(balance, 6)} USDC but need ${formatUnits(amountWei, 6)} USDC`);
+        }
+      } catch (err: any) {
+        if (err.message.includes('Insufficient')) throw err;
+        console.error('Error checking USDC balance:', err);
+        // Continue anyway if we can't check the balance
+        console.log('Continuing with deposit despite balance check error');
       }
 
       // 6. Get Wormhole fee (send 2x for reliability)
@@ -83,16 +100,23 @@ export function useDeposit() {
         userAddress,
         BASE_SEPOLIA_CONTRACTS.AaveDepositorBase
       );
+      console.log('Current allowance:', formatUnits(allowance, 6), 'USDC');
+      console.log('Required allowance:', formatUnits(amountWei, 6), 'USDC');
 
-      // 8. Approve if needed
+      // 8. Approve maximum amount to avoid future approvals
+      const maxApproval = ethers.MaxUint256;
       if (allowance < amountWei) {
-        console.log('Approving USDC...');
+        console.log('Approving maximum USDC for AaveDepositorBase...');
+        console.log('Approving to contract:', BASE_SEPOLIA_CONTRACTS.AaveDepositorBase);
         const approveTx = await usdc.approve(
           BASE_SEPOLIA_CONTRACTS.AaveDepositorBase,
-          amountWei
+          maxApproval
         );
-        await approveTx.wait();
-        console.log('USDC approved');
+        console.log('Approval transaction sent, waiting for confirmation...');
+        const approvalReceipt = await approveTx.wait();
+        console.log('USDC approved with max allowance! Tx:', approvalReceipt?.hash);
+      } else {
+        console.log('Sufficient allowance already exists, skipping approval');
       }
 
       // 9. Deposit

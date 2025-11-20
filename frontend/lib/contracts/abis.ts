@@ -32,6 +32,12 @@ export const CERC20_MINTER_ABI = [
   'event WithdrawMessageSent(address indexed user, uint256 amount)',
 ] as const;
 
+export const CERC20_ABI = [
+  'function balanceOf(address owner) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
+] as const;
+
 export const ERC20_ABI = [
   'function balanceOf(address owner) view returns (uint256)',
   'function approve(address spender, uint256 amount) returns (bool)',
