@@ -18,6 +18,12 @@ const nextConfig = {
       };
     }
 
+    // Fix for MetaMask SDK trying to import React Native packages in browser
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@react-native-async-storage/async-storage': false,
+    };
+
     return config;
   },
 };
