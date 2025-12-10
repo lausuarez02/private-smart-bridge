@@ -1,5 +1,5 @@
 export const BASE_SEPOLIA_CONTRACTS = {
-  AaveDepositorBase: '0x7D0Fb33E2f5cC55c72018b8720fEdcb8a985A0Fd',
+  AaveDepositorBase: '0xf42E3391E7103AD7D3a76cD70d6e612de4C99B22',
   USDC: '0xba50Cd2A20f6DA35D788639E581bca8d0B5d4D5f', // USDC token that contract expects
   AavePool: '0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27',
   WormholeRelayer: '0x93BAD53DDfB6132b0aC8E37f6029163E63372cEE',
